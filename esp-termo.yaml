@@ -78,6 +78,6 @@ sensor:
       - above: 5.5
         then:
           - switch.turn_off: waterpump
-      - below: 3.5
+      - below: 3.0
         then:
           - switch.turn_on: waterpump
