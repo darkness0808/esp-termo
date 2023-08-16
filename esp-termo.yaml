@@ -1,5 +1,5 @@
 substitutions:
-  project_version: "1.0.0"
+  project_version: "2.0.0"
   device_description: "Обеспечивает работу устройств в котельной"
 dashboard_import:
   package_import_url: github://darkness0808/esp-termo/esp-termo.yaml@main
@@ -70,9 +70,9 @@ sensor:
           window_size: 10
           send_every: 1
     on_value_range:
-      - above: 5.0
+      - above: 5.5
         then:
           - switch.turn_off: waterpump
-      - below: 4.0
+      - below: 3.5
         then:
           - switch.turn_on: waterpump
