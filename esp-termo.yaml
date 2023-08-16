@@ -39,7 +39,29 @@ wifi:
     ssid: "Esp-Termo Fallback Hotspot"
     password: "DNIc0lrbRK7w"
 captive_portal:
-
+number:
+  - platform: template
+    name: "Water pressure max"
+    id: max_press
+    mode: box
+    unit_of_measurement: "bar"
+    optimistic: true
+    min_value: 1
+    max_value: 10
+    step: 0.1
+    restore_value: yes
+    initial_value: 4.5
+  - platform: template
+    name: "Water pressure min"
+    id: min_press
+    mode: box
+    unit_of_measurement: "bar"
+    optimistic: true
+    min_value: 1
+    max_value: 10
+    step: 0.1
+    restore_value: yes
+    initial_value: 3.5
 switch:
   - platform: gpio
     pin: 13
@@ -53,19 +75,20 @@ dallas:
 sensor:
   - platform: dallas
     address: 0x083c01d075ff8428
-    name: "tsensor 1"
+    name: "Temperature sensor 1"
   - platform: dallas
     address: 0xff031097794b6428
-    name: "tsensor 2"
+    name: "Temperature sensor 2"
   - platform: dallas
     address: 0xfd3c01d607752c28
-    name: "tsensor 3"
+    name: "Temperature sensor 3"
   - platform: adc
+    id: water_press
     pin: 34
     update_interval: 500ms
     attenuation: auto
-    name: "Давление воды"
-    unit_of_measurement: "бар"
+    name: "Water pressure"
+    unit_of_measurement: "bar"
     accuracy_decimals: 4
     filters:
       - calibrate_linear:
@@ -75,9 +98,9 @@ sensor:
           window_size: 10
           send_every: 1
     on_value_range:
-      - above: 5.5
+      - above: 'max_press'
         then:
           - switch.turn_off: waterpump
-      - below: 3.0
+      - below: 'min_press'
         then:
           - switch.turn_on: waterpump
