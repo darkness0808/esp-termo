@@ -1,14 +1,19 @@
 substitutions:
+  device_name: esp-termo
   project_version: "2.0.0"
   device_description: "Обеспечивает работу устройств в котельной"
 dashboard_import:
   package_import_url: github://darkness0808/esp-termo/esp-termo.yaml@main
 esphome:
-  name: esp-termo
+  name: '${device_name}'
+  comment: '${device_description}'
   friendly_name: 'ESP boilerhouse'
   project:
     name: "darkness0808.esp-termo"
     version: "${project_version}"
+# Choose the right Platform
+# esp32: https://esphome.io/components/esp32.html
+# esp8266: https://esphome.io/components/esp8266.html
 esp32:
   board: esp32dev
   framework:
