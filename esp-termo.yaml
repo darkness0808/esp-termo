@@ -6,6 +6,9 @@ dashboard_import:
 esphome:
   name: esp-termo
   friendly_name: 'ESP boilerhouse'
+  project:
+    name: "darkness0808.esp-termo"
+    version: "${project_version}"
 esp32:
   board: esp32dev
   framework:
