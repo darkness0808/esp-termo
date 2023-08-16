@@ -1,0 +1,75 @@
+substitutions:
+  project_version: "1.0.0"
+  device_description: "Обеспечивает работу устройств в котельной"
+dashboard_import:
+  package_import_url: github://klaasnicolaas/home-assistant-glow/home_assistant_glow.yaml@main
+esphome:
+  name: esp-termo
+  friendly_name: 'ESP boilerhouse'
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+# Enable Web server
+web_server:
+  port: 80
+# Enable logging
+logger:
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "aNDUbCO2byAMFXZdMu+p2T7SnD6nB1ZilduqKpWcuAg="
+# Enable OTA update
+ota:
+  password: "7a47143c1f01cf53a5f8ca7119bf587d"
+# Enable WIFI
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+# Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Esp-Termo Fallback Hotspot"
+    password: "DNIc0lrbRK7w"
+captive_portal:
+
+switch:
+  - platform: gpio
+    pin: 13
+    name: "Relay"
+    id: waterpump
+button:
+  - platform: restart
+    name: "Restart - ESP_bolerhouse"
+dallas:
+  - pin: GPIO15
+sensor:
+  - platform: dallas
+    address: 0x083c01d075ff8428
+    name: "tsensor 1"
+  - platform: dallas
+    address: 0xff031097794b6428
+    name: "tsensor 2"
+  - platform: dallas
+    address: 0xfd3c01d607752c28
+    name: "tsensor 3"
+  - platform: adc
+    pin: 34
+    update_interval: 500ms
+    attenuation: auto
+    name: "Давление воды"
+    unit_of_measurement: "бар"
+    accuracy_decimals: 4
+    filters:
+      - calibrate_linear:
+          - 0.35 -> 0.0
+          - 3.03 -> 10.0
+      - sliding_window_moving_average:
+          window_size: 10
+          send_every: 1
+    on_value_range:
+      - above: 5.0
+        then:
+          - switch.turn_off: waterpump
+      - below: 4.0
+        then:
+          - switch.turn_on: waterpump
