@@ -2,7 +2,7 @@ substitutions:
   project_version: "1.0.0"
   device_description: "Обеспечивает работу устройств в котельной"
 dashboard_import:
-  package_import_url: github://klaasnicolaas/home-assistant-glow/home_assistant_glow.yaml@main
+  package_import_url: github://darkness0808/esp-termo/blob/main/esp-termo.yaml@main
 esphome:
   name: esp-termo
   friendly_name: 'ESP boilerhouse'
