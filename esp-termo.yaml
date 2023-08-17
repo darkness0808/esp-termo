@@ -1,6 +1,6 @@
 substitutions:
   device_name: esp-termo
-  project_version: "2.0.0"
+  project_version: "1.0.5"
   device_description: "Обеспечивает работу устройств в котельной"
 dashboard_import:
   package_import_url: github://darkness0808/esp-termo/esp-termo.yaml@main
@@ -11,6 +11,26 @@ esphome:
   project:
     name: "darkness0808.esp-termo"
     version: "${project_version}"
+  on_loop:
+    then:
+      - if:
+          condition:
+            and:
+              - lambda: 'return {id(water_press).state < id(min_press).state};'
+              - binary_sensor.is_off: power
+          then:
+            - switch.turn_on: waterpump
+            - lambda: 'id(power).publish_state(true);'
+          else:
+            - while:
+                condition:
+                  and:
+                    - lambda: 'return {id(water_press).state > id(max_press).state};'
+                    - binary_sensor.is_on: power
+                then:
+                  - switch.turn_off: waterpump
+                  - lambda: 'id(power).publish_state(false);'
+
 # Choose the right Platform
 # esp32: https://esphome.io/components/esp32.html
 # esp8266: https://esphome.io/components/esp8266.html
@@ -39,9 +59,14 @@ wifi:
     ssid: "Esp-Termo Fallback Hotspot"
     password: "DNIc0lrbRK7w"
 captive_portal:
+binary_sensor:
+  - platform: template
+    device_class: power
+    id: power
+    internal: True
 number:
   - platform: template
-    name: "Water pressure max"
+    name: "4_Water pressure max"
     id: max_press
     mode: box
     unit_of_measurement: "bar"
@@ -52,7 +77,7 @@ number:
     restore_value: yes
     initial_value: 4.5
   - platform: template
-    name: "Water pressure min"
+    name: "5_Water pressure min"
     id: min_press
     mode: box
     unit_of_measurement: "bar"
@@ -65,29 +90,29 @@ number:
 switch:
   - platform: gpio
     pin: 13
-    name: "Relay"
+    name: "7_Relay"
     id: waterpump
 button:
   - platform: restart
-    name: "Restart - ESP_bolerhouse"
+    name: "8_Restart - ESP"
 dallas:
   - pin: GPIO15
 sensor:
   - platform: dallas
     address: 0x083c01d075ff8428
-    name: "Temperature sensor 1"
+    name: "1_Temperature sensor 1"
   - platform: dallas
     address: 0xff031097794b6428
-    name: "Temperature sensor 2"
+    name: "2_Temperature sensor 2"
   - platform: dallas
     address: 0xfd3c01d607752c28
-    name: "Temperature sensor 3"
+    name: "3_Temperature sensor 3"
   - platform: adc
     id: water_press
     pin: 34
     update_interval: 500ms
     attenuation: auto
-    name: "Water pressure"
+    name: "6_Water pressure"
     unit_of_measurement: "bar"
     accuracy_decimals: 4
     filters:
@@ -97,10 +122,3 @@ sensor:
       - sliding_window_moving_average:
           window_size: 10
           send_every: 1
-    on_value_range:
-      - above: 'max_press'
-        then:
-          - switch.turn_off: waterpump
-      - below: 'min_press'
-        then:
-          - switch.turn_on: waterpump
